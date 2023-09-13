@@ -92,3 +92,17 @@ CREATE TABLE IF NOT EXISTS TimeTracking (
     "State" VARCHAR NOT NULL  CHECK ("State" IN ('1', '2')),
 	CONSTRAINT fk_TimeTracking_Peer foreign key (Peer) references Peers(Nickname)
 );
+
+
+CREATE OR REPLACE PROCEDURE ExportToCSV
+(tabl varchar, filepath varchar, delim char(1))
+AS $$
+  BEGIN
+EXECUTE FORMAT('COPY '||tabl||' TO %L WITH CSV DELIMITER %L', filepath, delim);
+  END;
+  $$LANGUAGE plpgsql;
+
+
+
+
+CALL ExportToCSV('Peers', '/Users/craftbec/Desktop/test3.csv', ';')
