@@ -158,19 +158,15 @@ INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 
 
 INSERT INTO TransferredPoints(CheckingPeer, CheckedPeer, PointsAmount) VALUES
-('ainorval','omarval',  '1'),
+('ainorval','omarval',  '2'),
 ('itchyole', 'mjollor',  '1'),
-('kathayr','omarval',  '1'),
+('kathayr','omarval',  '2'),
 ('oneudata','desperos',  '1'),
-('tomokoki','omarval',  '1'),
+('tomokoki','omarval',  '2'),
 ('mikecall''omarval',  '1'),
-('kathayr','omarval',  '1'),
 ('itchyole','omarval', '1'),
-('ainorval','omarval',  '1'),
 ('floridas','omarval',  '1'),
-('tomokoki','omarval',  '1'),
-('omarval','lorettec',  '1'),
-('omarval','lorettec',  '1'),
+('omarval','lorettec',  '2'),
 ('mikecall','lorettec',  '1'),
 ('mjollor','mikecall',  '1'),
 ('elmersha','floridas',  '1'),
