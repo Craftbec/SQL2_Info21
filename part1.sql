@@ -105,4 +105,15 @@ EXECUTE FORMAT('COPY '||tabl||' TO %L WITH CSV DELIMITER %L', filepath, delim);
 
 
 
+CREATE OR REPLACE PROCEDURE ExportFromCSV
+(tabl varchar, filepath varchar, delim char(1))
+AS $$
+  BEGIN
+EXECUTE FORMAT('COPY '||tabl||' FROM %L WITH CSV DELIMITER %L', filepath, delim);
+  END;
+  $$LANGUAGE plpgsql;
+
+
+
 CALL ExportToCSV('Peers', '/Users/craftbec/Desktop/test3.csv', ';')
+CALL ExportFromCSV('Peers', '/Users/craftbec/Desktop/test3.csv', ';')
