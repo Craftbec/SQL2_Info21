@@ -163,7 +163,7 @@ INSERT INTO TransferredPoints(CheckingPeer, CheckedPeer, PointsAmount) VALUES
 ('kathayr','omarval',  '2'),
 ('oneudata','desperos',  '1'),
 ('tomokoki','omarval',  '2'),
-('mikecall''omarval',  '1'),
+('mikecall','omarval',  '1'),
 ('itchyole','omarval', '1'),
 ('floridas','omarval',  '1'),
 ('omarval','lorettec',  '2'),
