@@ -118,6 +118,29 @@ $$ LANGUAGE plpgsql;
 SELECT * FROM FncMostTask();
 
 //7
+INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
+('41','floridas', 'C6_s21_matrix', '2023-09-11'),
+('42','floridas', 'C7_SmartCalc_v1.0', '2023-09-12'),
+('43','floridas', 'C8_3DViewer_v1.0', '2023-09-12');
+
+
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(41, 'ainorval',  'Success', '10:30:15'), 
+(42, 'melodigr',  'Success', '11:23:15'), 
+(43, 'onrtyef',  'Success', '18:12:34');
+
+
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(41, 'Start', '11:30:34'), 
+(42, 'Start', '14:30:23'), 
+(43, 'Start', '15:30:54'), 
+(41, 'Success', '11:32:13'), 
+(42, 'Success', '14:45:25'), 
+(43, 'Success', '15:56:15');
+
+
+
+
 
  WITH block AS (SELECT Task FROM Checks
  WHERE Task LIKE '%' || 'C'|| '%')
@@ -125,11 +148,133 @@ SELECT * FROM FncMostTask();
 
 //8
 
+INSERT INTO Recommendations(Peer, RecommendedPeer) VALUES
+('morrisro', 'oneudata');
+
+CREATE OR REPLACE FUNCTION FncCheckRecommendation()
+RETURNS  TABLE("Peer" VARCHAR, "RecommendedPeer" VARCHAR) AS $$
+BEGIN
+RETURN QUERY
+	WITH tmp AS (
+		SELECT Peer, RecommendedPeer, COUNT(RecommendedPeer) AS recoms
+		FROM Recommendations
+		GROUP BY Peer, RecommendedPeer
+	),
+	tmpcount AS (
+		SELECT tmp.RecommendedPeer, COUNT(tmp.RecommendedPeer) AS coun, Friends.Peer1 AS Peer
+		FROM tmp
+		LEFT JOIN Friends ON tmp.Peer = Friends.Peer2
+		WHERE Friends.Peer1 != tmp.RecommendedPeer
+		GROUP BY tmp.RecommendedPeer, tmp.Peer,Friends.Peer1
+	),
+	res AS (
+		SELECT tmpcount.Peer, tmpcount.RecommendedPeer, coun, 
+			ROW_NUMBER() OVER (PARTITION BY tmpcount.Peer ORDER BY COUNT(*) DESC) AS rank
+		FROM tmpcount
+		WHERE coun = (SELECT MAX(coun) 
+						FROM tmpcount) AND tmpcount.Peer != tmpcount.RecommendedPeer
+		GROUP BY tmpcount.Peer, tmpcount.RecommendedPeer, coun
+		ORDER BY tmpcount.Peer ASC
+	)
+	SELECT Peer, RecommendedPeer
+	FROM res
+	WHERE rank = 1;
+	END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT * FROM FncCheckRecommendation();
+
+
 //9
+
+
+
 
 //10
 
+INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
+('50','elmersha', 'C2_SimpleBash', '2023-03-26');
+
+
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(50, 'ainorval',  'Start', '12:35:15');
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(50, 'ainorval',  'Success', '12:36:25');
+
+
+
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(50, 'Start', '12:35:35');
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(50, 'Success', '12:46:48');
+
+
+CREATE OR REPLACE FUNCTION FncCheckBirthday()
+RETURNS  TABLE(SuccessfulChecks BIGINT, UnsuccessfulChecks BIGINT) AS $$
+BEGIN
+RETURN QUERY
+WITH 
+Yess AS (
+SELECT COUNT(*) AS amount FROM  Peers
+JOIN (
+SELECT peer, "Date", P2P."State" FROM Checks
+JOIN P2P
+ON Checks.id = P2P."Check"
+JOIN Verter
+ON Checks.id = Verter."Check"
+WHERE (Verter."State" = 'Success' OR Verter."State" IS NULL) AND P2P."State" = 'Success')  AS tmp
+ON Peers.nickname = tmp.peer AND EXTRACT(MONTH FROM tmp."Date") = EXTRACT(MONTH FROM Peers.Birthday) AND
+ EXTRACT(DAY FROM tmp."Date") = EXTRACT(DAY FROM Peers.Birthday)),
+Noo AS (
+SELECT COUNT(*) AS amount FROM  Peers
+JOIN (
+SELECT peer, "Date", P2P."State" FROM Checks
+JOIN P2P
+ON Checks.id = P2P."Check"
+JOIN Verter
+ON Checks.id = Verter."Check"
+WHERE (Verter."State" = 'Failure' OR Verter."State" IS NULL) AND P2P."State" = 'Failure')  AS tmp
+ON Peers.nickname = tmp.peer AND EXTRACT(MONTH FROM tmp."Date") = EXTRACT(MONTH FROM Peers.Birthday) AND
+EXTRACT(DAY FROM tmp."Date") = EXTRACT(DAY FROM Peers.Birthday)),
+total AS (SELECT COALESCE(Yess.amount, 0) + COALESCE((SELECT amount FROM Noo), 0) AS amount FROM Yess)
+SELECT (COALESCE((ps.amount::FLOAT), 0)/(SELECT amount FROM total)*100)::BIGINT, (COALESCE((SELECT amount FROM Noo)::FLOAT, 0)/(SELECT amount FROM total)*100)::BIGINT
+FROM Yess AS ps;
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT * FROM FncCheckBirthday();
+
+
 //11
+
+CREATE OR REPLACE FUNCTION FncPeersSuccess(ts VARCHAR)
+RETURNS TABLE(Peer VARCHAR) AS $$
+BEGIN
+RETURN QUERY
+SELECT Checks.peer FROM Checks
+JOIN P2P
+ON Checks.id = P2P."Check"
+JOIN Verter
+ON Checks.id = Verter."Check"
+WHERE Checks.task =ts AND P2P."State"='Success' AND Verter."State"='Success';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION FncPeersSuccess(ts VARCHAR)
+RETURNS TABLE(Task1 VARCHAR, Task2 VARCHAR, Task3 VARCHAR) AS $$
+BEGIN
+RETURN QUERY
+SELECT * FROM FncPeersSuccess('C2_SimpleBash')
+SELECT * FROM FncPeersSuccess('C6_s21_matrix')
+
+SELECT * FROM FncPeersSuccess('C4_s21_math')
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM FncPeersSuccess('C7_SmartCalc_v1.0')
 
 //12
 
