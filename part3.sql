@@ -249,6 +249,61 @@ SELECT * FROM FncCheckBirthday();
 
 //11
 
+
+INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
+('51','lorettec', 'C3_s21_string+', '2023-03-26');
+
+
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(51, 'ainorval',  'Start', '12:35:15');
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(51, 'ainorval',  'Success', '12:36:25');
+
+
+
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(51, 'Start', '12:35:35');
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(51, 'Success', '12:46:48');
+
+
+
+INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
+('52','mjollor', 'C3_s21_string+', '2023-03-26');
+
+
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(52, 'ainorval',  'Start', '12:35:15');
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(52, 'ainorval',  'Success', '12:36:25');
+
+
+
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(52, 'Start', '12:35:35');
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(52, 'Success', '12:46:48');
+
+
+
+
+INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
+('53','mjollor', 'C7_SmartCalc_v1.0', '2023-03-28');
+
+
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(53, 'ainorval',  'Start', '12:35:15');
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(53, 'ainorval',  'Success', '12:36:25');
+
+
+
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(53, 'Start', '12:35:35');
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(53, 'Success', '12:46:48');
+
+
 CREATE OR REPLACE FUNCTION FncPeersSuccess(ts VARCHAR)
 RETURNS TABLE(Peer VARCHAR) AS $$
 BEGIN
@@ -261,22 +316,46 @@ ON Checks.id = Verter."Check"
 WHERE Checks.task =ts AND P2P."State"='Success' AND Verter."State"='Success';
 END;
 $$ LANGUAGE plpgsql;
+ 
 
 
-CREATE OR REPLACE FUNCTION FncPeersSuccess(ts VARCHAR)
-RETURNS TABLE(Task1 VARCHAR, Task2 VARCHAR, Task3 VARCHAR) AS $$
+
+CREATE OR REPLACE FUNCTION FncPeersGivenTask(Task1 VARCHAR, Task2 VARCHAR, Task3 VARCHAR)
+RETURNS TABLE( Peer VARCHAR) AS $$
 BEGIN
 RETURN QUERY
-SELECT * FROM FncPeersSuccess('C2_SimpleBash')
-SELECT * FROM FncPeersSuccess('C6_s21_matrix')
-
-SELECT * FROM FncPeersSuccess('C4_s21_math')
+SELECT * FROM FncPeersSuccess(Task1)
+INTERSECT
+SELECT * FROM FncPeersSuccess(Task2)
+EXCEPT
+SELECT * FROM FncPeersSuccess(Task3);
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT * FROM FncPeersSuccess('C7_SmartCalc_v1.0')
+SELECT * FROM FncPeersGivenTask('C2_SimpleBash','C3_s21_string+', 'C7_SmartCalc_v1.0');
 
 //12
+
+CREATE OR REPLACE FUNCTION FncRecursive()
+RETURNS TABLE(Task VARCHAR, PrevCount INTEGER) AS $$
+BEGIN
+RETURN QUERY
+	WITH RECURSIVE tmp AS (
+		SELECT Title, 0 AS Prev
+		FROM Tasks
+		WHERE ParentTask IS NULL
+		UNION ALL
+		SELECT t.Title, tmp.Prev + 1
+		FROM Tasks AS t
+		INNER JOIN tmp ON t.ParentTask = tmp.Title
+	)
+	SELECT Title AS Task, Prev
+	FROM tmp;
+END;
+  $$ LANGUAGE plpgsql;
+  
+ SELECT * FROM  FncRecursive();
+
 
 //13
 
