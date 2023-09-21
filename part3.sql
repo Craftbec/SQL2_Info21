@@ -104,13 +104,17 @@ CREATE OR REPLACE FUNCTION FncMostTask()
 RETURNS  TABLE("Day" DATE, "Task" VARCHAR) AS $$
 BEGIN
 RETURN QUERY
-WITH
-res AS (SELECT "Date" AS D , task, COUNT(task) AS  countt FROM  Checks
-GROUP BY D, task)
-SELECT res.D, task FROM res
-JOIN  ( SELECT D, MAX(countt) AS Mcount from res GROUP BY res.D) AS tmp
-ON res.D=tmp.D AND res.countt = tmp.Mcount
-ORDER BY D, task;
+SELECT "Date", Task
+	FROM (
+		SELECT *, 
+		ROW_NUMBER() OVER (PARTITION BY "Date" ORDER BY counn DESC) AS mor
+		FROM(
+			SELECT "Date", Task, COUNT(*) AS counn
+			FROM Checks
+			GROUP BY "Date", Task
+		) AS tmp
+	)AS tt
+	WHERE mor = 1;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -360,9 +364,123 @@ END;
 //13
 
 //14
+INSERT INTO XP("Check", XPAmount) VALUES
+(41, 50),
+(42, 100),
+(43, 150),
+(50, 200),
+(51, 170),
+(52, 160),
+(53, 175);
+
+CREATE OR REPLACE FUNCTION FncPeerMostXP()
+RETURNS  TABLE(Peer VARCHAR, XP NUMERIC) AS $$
+BEGIN
+RETURN QUERY
+SELECT Checks.peer, SUM(XP.xpamount) AS ssum FROM Checks
+JOIN P2P
+ON Checks.id = P2P."Check"
+JOIN Verter
+ON Checks.id = Verter."Check"
+JOIN XP
+ON Checks.id = XP."Check"
+WHERE P2P."State"='Success' AND Verter."State"='Success'
+GROUP BY Checks.peer
+ORDER BY ssum DESC
+LIMIT 1;
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT * FROM FncPeerMostXP();
 
 //15
+INSERT INTO TimeTracking(Peer, "Date", "Time", "State") VALUES
+('omarval', '2023-09-20', TIME '11:15:22', '1'),
+('omarval', '2023-09-20', TIME '16:18:14', '2');
+
+CREATE OR REPLACE FUNCTION FncBeforeTime(Tim TIME, N INTEGER)
+RETURNS  TABLE("Peer" VARCHAR) AS $$
+BEGIN
+RETURN QUERY
+SELECT peer FROM  TimeTracking
+WHERE "State" = '1' AND "Time"<Tim
+GROUP BY peer
+HAVING COUNT(*) >= N;
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT * FROM FncBeforeTime('12:00:00', 2);
+
 
 //16
 
+CREATE OR REPLACE FUNCTION FncPeerLeftCampus(N INTEGER, Mm INTEGER)
+RETURNS  TABLE("Peer" VARCHAR) AS $$
+BEGIN
+RETURN QUERY
+SELECT peer FROM  TimeTracking
+WHERE "State"='2' AND "Date" > (CURRENT_DATE - N)
+GROUP BY peer
+HAVING COUNT(*) >= Mm;
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT * FROM FncPeerLeftCampus(19, 2);
+
 //17
+
+INSERT INTO TimeTracking(Peer, "Date", "Time", "State") VALUES
+('ainorval', '2023-01-20', TIME '11:15:22', '1'),
+('ainorval', '2023-01-20', TIME '16:18:14', '2'),
+('ainorval', '2023-01-25', TIME '15:15:22', '1'),
+('ainorval', '2023-01-25', TIME '16:18:14', '2'),
+('ainorval', '2023-01-29', TIME '07:15:22', '1'),
+('ainorval', '2023-01-29', TIME '16:18:14', '2'),
+('itchyole', '2023-04-02', TIME '07:15:22', '1'),
+('itchyole', '2023-04-02', TIME '16:18:14', '2'),
+('itchyole', '2023-04-03', TIME '07:15:22', '1'),
+('itchyole', '2023-04-03', TIME '16:18:14', '2'),
+('itchyole', '2023-04-04', TIME '07:15:22', '1'),
+('itchyole', '2023-04-04', TIME '16:18:14', '2'),
+('itchyole', '2023-04-05', TIME '07:15:22', '1'),
+('itchyole', '2023-04-05', TIME '16:18:14', '2'),
+('onrtyef', '2023-05-05', TIME '16:15:22', '1'),
+('onrtyef', '2023-05-05', TIME '16:18:14', '2'),
+('onrtyef', '2023-05-05', TIME '18:15:22', '1'),
+('onrtyef', '2023-05-05', TIME '19:18:14', '2');
+
+
+
+CREATE OR REPLACE FUNCTION FncEarlyEntries()
+RETURNS  TABLE( "Month" TEXT, EarlyEntries NUMERIC) AS $$
+BEGIN
+RETURN QUERY
+WITH 
+    tmp AS (SELECT "Time", EXTRACT(MONTH FROM Peers.Birthday) AS mon
+      FROM TimeTracking
+	JOIN Peers
+ON TimeTracking.peer=Peers.nickname		
+      WHERE EXTRACT(MONTH FROM TimeTracking."Date") = EXTRACT(MONTH FROM Peers.birthday) AND TimeTracking."State" = '1'),
+    early AS (SELECT mon, COUNT("Time") AS ale
+      FROM tmp
+	WHERE "Time" < '12:00'
+      GROUP BY mon), 
+	  total AS (
+	 SELECT mon, COUNT("Time") AS al
+      FROM tmp
+      GROUP BY mon
+	  )
+	 SELECT  to_char(make_date(2000, CAST(total.mon as integer), 1), 'Month'),
+	  ROUND(COALESCE(early.ale * 100.0 / total.al, 0))
+	 FROM total
+	 LEFT JOIN early
+	 ON total.mon = early.mon
+	   ORDER BY total.mon; 
+END;
+$$ LANGUAGE plpgsql;
+
+
+SELECT * FROM FncEarlyEntries();

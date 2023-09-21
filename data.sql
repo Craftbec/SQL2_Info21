@@ -66,7 +66,7 @@ INSERT INTO TimeTracking(Peer, "Date", "Time", "State") VALUES
 ('elmersha', '2023-09-01', TIME '09:12:49', '1'),
 ('onrtyef', '2023-09-01', TIME '14:03:16', '1'),
 ('mikecall', '2023-09-01', TIME '18:07:03', '1'),
-('omarval', '2023-10-01', TIME '08:15:22', '2'),
+('omarval', '2023-08-01', TIME '08:15:22', '2'),
 ('morrisro', '2023-09-01', TIME '22:25:36', '2'),
 ('elmersha', '2023-09-01', TIME '19:12:49', '2'),
 ('onrtyef', '2023-09-01', TIME '15:03:16', '2'),
