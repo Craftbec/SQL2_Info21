@@ -145,10 +145,26 @@ INSERT INTO Verter("Check", "State", "Time") VALUES
 
 
 
+CREATE OR REPLACE FUNCTION FncFullComplet( block VARCHAR)
+RETURNS  TABLE( "Peer" VARCHAR, "Day" Date) AS $$
+DECLARE ts VARCHAR;
+BEGIN
+ts := (SELECT title FROM Tasks
+WHERE title LIKE block|| '%'
+ORDER BY title DESC
+LIMIT 1);
+RETURN QUERY
+SELECT Checks.peer, Checks."Date" FROM Checks
+JOIN P2P
+ON Checks.id = P2P."Check"
+JOIN Verter
+ON Checks.id = Verter."Check"
+WHERE Checks.task =ts AND P2P."State"='Success' AND Verter."State"='Success';
+END;
+$$ LANGUAGE plpgsql;
 
- WITH block AS (SELECT Task FROM Checks
- WHERE Task LIKE '%' || 'C'|| '%')
- SELECT * FROM block
+
+SELECT * FROM FncFullComplet('C');
 
 //8
 
@@ -192,7 +208,37 @@ SELECT * FROM FncCheckRecommendation();
 
 //9
 
+CREATE OR REPLACE FUNCTION FncPercentagePeers(block1  VARCHAR, block2 VARCHAR)
+RETURNS  TABLE( StartedBlock1 NUMERIC,  StartedBlock2 NUMERIC, StartedBothBlocks NUMERIC,  DidntStartAnyBlock NUMERIC) AS $$
+DECLARE coun BIGINT;
+BEGIN
+coun := (SELECT COUNT(*) FROM  Peers);
+RETURN QUERY
+WITH
+bl1 AS (
+SELECT DISTINCT(peer) FROM  Checks
+WHERE task LIKE block1 || '%'),
+bl2 AS (
+SELECT DISTINCT(peer) FROM  Checks
+WHERE task LIKE block2 || '%'),
+bl3 AS (SELECT bl1.peer FROM bl1
+JOIN bl2
+ON bl1.peer = bl2.peer
+),
+bl4 AS (SELECT nickname FROM Peers
+LEFT JOIN bl1
+ON Peers.nickname = bl1.peer
+LEFT JOIN bl2
+ON Peers.nickname = bl2.peer
+WHERE bl1.peer IS NULL AND bl2.peer IS NULL
+)
+SELECT ROUND((SELECT COUNT(*) FROM bl1) * 100.0 / coun), ROUND((SELECT COUNT(*) FROM bl2) * 100.0 / coun), 
+ROUND((SELECT COUNT(*) FROM bl3) * 100.0 / coun), ROUND((SELECT COUNT(*) FROM bl4) * 100.0 / coun);
+END;
+$$ LANGUAGE plpgsql;
 
+
+SELECT * FROM FncPercentagePeers('C', 'D');
 
 
 //10
