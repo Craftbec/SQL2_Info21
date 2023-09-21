@@ -469,6 +469,63 @@ INSERT INTO Verter("Check", "State", "Time") VALUES
 (65, 'Failure', '12:35:35');
 
 
+
+
+CREATE OR REPLACE FUNCTION FncLackyDays(N INTEGER)
+RETURNS TABLE("Datee" Date) AS $$
+BEGIN
+RETURN QUERY
+WITH
+tmp AS (
+ SELECT Checks.id, xpamount, maxxp,  (maxxp*0.8)::INTEGER AS tt  FROM XP
+ JOIN Checks
+ ON Checks.id = XP."Check"
+ JOIN Tasks
+ ON Tasks.title = Checks.task
+),
+ success AS (
+ SELECT tmp.id FROM tmp
+ WHERE xpamount>tt),
+ tmp2 AS (
+SELECT "Date", COUNT("Date") AS cout FROM Checks
+GROUP BY "Date"),
+tt AS (
+SELECT tmp2."Date", Checks.id FROM tmp2
+JOIN Checks
+ON tmp2."Date"=Checks."Date"
+WHERE tmp2.cout>=N),
+rr AS (
+ SELECT "Date", COUNT(*) AS ttt FROM tt
+ JOIN success
+ ON success.id = tt.id
+ GROUP BY "Date"), 
+ res AS (
+SELECT rr."Date", mp."State" AS ps, Verter."State" AS vs  FROM rr
+JOIN Checks
+ON rr."Date"=Checks."Date"
+JOIN P2P
+ON P2P."Check" = Checks.id
+JOIN 
+(SELECT * FROM P2P WHERE P2P."State"<>'Start') AS mp
+ON mp."Check"=Checks.id
+JOIN Verter
+ON Verter."Check"=Checks.id OR Checks.id IS NULL
+WHERE rr.ttt>=N AND P2P."State"='Start'AND Verter."State"<>'Start'
+ORDER BY rr."Date", P2P."Time"),
+total AS (
+SELECT "Date", (CASE WHEN (res.ps='Success' AND res.vs ='Success') THEN 1 ELSE 0 END) AS yu FROM res),
+fin AS (
+SELECT "Date", yu, sum(yu) OVER (ORDER BY "Date"  ROWS BETWEEN N - 1 PRECEDING AND CURRENT ROW) AS  num
+FROM total)
+SELECT DISTINCT("Date") FROM fin
+WHERE num>=N;
+	
+END;
+  $$ LANGUAGE plpgsql;
+  
+ SELECT * FROM  FncLackyDays(3);
+
+
 //14
 INSERT INTO XP("Check", XPAmount) VALUES
 (41, 50),
