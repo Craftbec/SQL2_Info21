@@ -409,6 +409,66 @@ END;
 
 //13
 
+ INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
+('60','lorettec', 'D01_Linux', '2023-09-21'),
+('61','kathayr', 'D01_Linux', '2023-09-21'),
+('62','lorettec', 'D02_LinuxNetwork', '2023-09-20'),
+('63','kathayr', 'D02_LinuxNetwork', '2023-09-20'),
+('64','morrisro', 'D01_Linux', '2023-09-20');
+
+
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(60, 'morrisro',  'Start', '12:09:15'),
+(61, 'ainorval',  'Start', '12:09:15'),
+(62, 'desperos',  'Start', '12:09:15'),
+(63, 'ainorval',  'Start', '12:10:15'),
+(64, 'elmersha',  'Start', '12:12:15');
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(60, 'morrisro',  'Success', '12:36:25'),
+(61, 'ainorval',  'Success', '12:23:15'),
+(62, 'desperos',  'Success', '12:43:15'),
+(63, 'ainorval',  'Success', '12:12:15'),
+(64, 'elmersha',  'Success', '12:12:15');
+
+
+
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(60, 'Start', '12:35:35'),
+(61, 'Start', '12:35:35'),
+(62, 'Start', '12:35:35'),
+(63, 'Start', '12:35:35'),
+(64, 'Start', '12:35:35');
+
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(60, 'Success', '12:46:48'),
+(61, 'Success', '12:46:48'),
+(62, 'Success', '12:46:48'),
+(63, 'Success', '12:46:48'),
+(64, 'Success', '12:46:48');
+
+
+INSERT INTO XP("Check", XPAmount) VALUES
+(60, 300),
+(61, 280),
+(62, 250),
+(63, 230),
+(64, 290);
+
+
+ INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
+('65','mjollor', 'D01_Linux', '2023-09-20');
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(65, 'morrisro',  'Start', '12:11:15');
+INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
+(65, 'morrisro',  'Success', '12:19:15');
+
+
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(65, 'Start', '12:35:35');
+INSERT INTO Verter("Check", "State", "Time") VALUES
+(65, 'Failure', '12:35:35');
+
+
 //14
 INSERT INTO XP("Check", XPAmount) VALUES
 (41, 50),
