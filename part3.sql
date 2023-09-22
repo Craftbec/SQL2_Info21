@@ -302,52 +302,30 @@ SELECT * FROM FncCheckBirthday();
 
 INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
 ('51','lorettec', 'C3_s21_string+', '2023-03-26');
-
-
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (51, 'ainorval',  'Start', '12:35:15');
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (51, 'ainorval',  'Success', '12:36:25');
-
-
-
 INSERT INTO Verter("Check", "State", "Time") VALUES
 (51, 'Start', '12:35:35');
 INSERT INTO Verter("Check", "State", "Time") VALUES
 (51, 'Success', '12:46:48');
-
-
-
 INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
 ('52','mjollor', 'C3_s21_string+', '2023-03-26');
-
-
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (52, 'ainorval',  'Start', '12:35:15');
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (52, 'ainorval',  'Success', '12:36:25');
-
-
-
 INSERT INTO Verter("Check", "State", "Time") VALUES
 (52, 'Start', '12:35:35');
 INSERT INTO Verter("Check", "State", "Time") VALUES
 (52, 'Success', '12:46:48');
-
-
-
-
 INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
 ('53','mjollor', 'C7_SmartCalc_v1.0', '2023-03-28');
-
-
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (53, 'ainorval',  'Start', '12:35:15');
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (53, 'ainorval',  'Success', '12:36:25');
-
-
-
 INSERT INTO Verter("Check", "State", "Time") VALUES
 (53, 'Start', '12:35:35');
 INSERT INTO Verter("Check", "State", "Time") VALUES
@@ -367,8 +345,6 @@ WHERE Checks.task =ts AND P2P."State"='Success' AND Verter."State"='Success';
 END;
 $$ LANGUAGE plpgsql;
  
-
-
 
 CREATE OR REPLACE FUNCTION FncPeersGivenTask(Task1 VARCHAR, Task2 VARCHAR, Task3 VARCHAR)
 RETURNS TABLE( Peer VARCHAR) AS $$
@@ -415,8 +391,6 @@ END;
 ('62','lorettec', 'D02_LinuxNetwork', '2023-09-20'),
 ('63','kathayr', 'D02_LinuxNetwork', '2023-09-20'),
 ('64','morrisro', 'D01_Linux', '2023-09-20');
-
-
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (60, 'morrisro',  'Start', '12:09:15'),
 (61, 'ainorval',  'Start', '12:09:15'),
@@ -429,40 +403,30 @@ INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (62, 'desperos',  'Success', '12:43:15'),
 (63, 'ainorval',  'Success', '12:12:15'),
 (64, 'elmersha',  'Success', '12:12:15');
-
-
-
 INSERT INTO Verter("Check", "State", "Time") VALUES
 (60, 'Start', '12:35:35'),
 (61, 'Start', '12:35:35'),
 (62, 'Start', '12:35:35'),
 (63, 'Start', '12:35:35'),
 (64, 'Start', '12:35:35');
-
 INSERT INTO Verter("Check", "State", "Time") VALUES
 (60, 'Success', '12:46:48'),
 (61, 'Success', '12:46:48'),
 (62, 'Success', '12:46:48'),
 (63, 'Success', '12:46:48'),
 (64, 'Success', '12:46:48');
-
-
 INSERT INTO XP("Check", XPAmount) VALUES
 (60, 300),
 (61, 280),
 (62, 250),
 (63, 230),
 (64, 290);
-
-
  INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
 ('65','mjollor', 'D01_Linux', '2023-09-20');
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (65, 'morrisro',  'Start', '12:11:15');
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (65, 'morrisro',  'Success', '12:19:15');
-
-
 INSERT INTO Verter("Check", "State", "Time") VALUES
 (65, 'Start', '12:35:35');
 INSERT INTO Verter("Check", "State", "Time") VALUES
