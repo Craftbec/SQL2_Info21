@@ -39,10 +39,10 @@ CREATE TABLE IF NOT EXISTS P2P(
 
 CREATE TABLE IF NOT EXISTS Verter (
 	ID SERIAL PRIMARY KEY,
-	"Check" BIGINT NOT NULL references Checks(ID) ON DELETE CASCADE,
+	"Check" BIGINT NOT NULL,
 	"State" status,
-	"Time" TIME NOT NULL
-	--CONSTRAINT fk_Verter_Check foreign key ("Check") references Checks (ID)
+	"Time" TIME NOT NULL,
+	CONSTRAINT fk_Verter_Check foreign key ("Check") references Checks (ID)
 );
 
 
@@ -112,8 +112,3 @@ AS $$
 EXECUTE FORMAT('COPY '||tabl||' FROM %L WITH CSV DELIMITER %L', filepath, delim);
   END;
   $$LANGUAGE plpgsql;
-
-
-
-CALL ExportToCSV('Peers', '/Users/craftbec/Desktop/test3.csv', ';')
-CALL ExportFromCSV('Peers', '/Users/craftbec/Desktop/test3.csv', ';')

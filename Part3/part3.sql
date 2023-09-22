@@ -1,4 +1,4 @@
-//1
+-- 1
 
 CREATE OR REPLACE FUNCTION FncTransferredPoints()
 RETURNS  TABLE(Peer1 VARCHAR, Peer2 VARCHAR, "PointsAmount" BIGINT) AS $$
@@ -15,10 +15,9 @@ SELECT CheckedPeer, CheckingPeer, -PointsAmount
 END;
 $$ LANGUAGE plpgsql;
 
+SELECT * FROM FncTransferredPoints();
 
-SELECT * FROM TransferredPoints();
-
-//2
+-- 2
 
 CREATE OR REPLACE FUNCTION FncPeerTaskXP()
 RETURNS  TABLE(Peer VARCHAR, Task VARCHAR, XP BIGINT) AS $$
@@ -33,10 +32,9 @@ WHERE P2P."State" = 'Success';
 END;
 $$ LANGUAGE plpgsql;
 
-
 SELECT * FROM FncPeerTaskXP();
 
-//3
+-- 3
 
 CREATE OR REPLACE FUNCTION FncAllday(allday Date DEFAULT CURRENT_DATE)
 RETURNS  TABLE("Peer" VARCHAR) AS $$
@@ -55,10 +53,9 @@ where count = 1;
 END;
 $$ LANGUAGE plpgsql;
 
+SELECT * FROM FncAllday('2023-09-01');
 
-SELECT * FROM FncAllday('2023-09-01')
-
-//4
+-- 4
 
 CREATE OR REPLACE FUNCTION FncPeerPoint()
 RETURNS  TABLE("Peer" VARCHAR, PointsChange NUMERIC) AS $$
@@ -75,10 +72,9 @@ ORDER BY PointsChange DESC;
 END;
 $$ LANGUAGE plpgsql;
 
-
 SELECT * FROM FncPeerPoint();
 
-//5
+-- 5
 
 CREATE OR REPLACE FUNCTION FncPeerPoint2()
 RETURNS  TABLE("Peer" VARCHAR, PointsChange NUMERIC) AS $$
@@ -95,10 +91,9 @@ ORDER BY PointsChange DESC;
 END;
 $$ LANGUAGE plpgsql;
 
-
 SELECT * FROM FncPeerPoint2();
 
-//6
+-- 6
 
 CREATE OR REPLACE FUNCTION FncMostTask()
 RETURNS  TABLE("Day" DATE, "Task" VARCHAR) AS $$
@@ -118,10 +113,10 @@ SELECT "Date", Task
 END;
 $$ LANGUAGE plpgsql;
 
-
 SELECT * FROM FncMostTask();
 
-//7
+-- 7
+
 INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
 ('41','floridas', 'C6_s21_matrix', '2023-09-11'),
 ('42','floridas', 'C7_SmartCalc_v1.0', '2023-09-12'),
@@ -142,9 +137,6 @@ INSERT INTO Verter("Check", "State", "Time") VALUES
 (42, 'Success', '14:45:25'), 
 (43, 'Success', '15:56:15');
 
-
-
-
 CREATE OR REPLACE FUNCTION FncFullComplet( block VARCHAR)
 RETURNS  TABLE( "Peer" VARCHAR, "Day" Date) AS $$
 DECLARE ts VARCHAR;
@@ -163,10 +155,9 @@ WHERE Checks.task =ts AND P2P."State"='Success' AND Verter."State"='Success';
 END;
 $$ LANGUAGE plpgsql;
 
-
 SELECT * FROM FncFullComplet('C');
 
-//8
+-- 8
 
 INSERT INTO Recommendations(Peer, RecommendedPeer) VALUES
 ('morrisro', 'oneudata');
@@ -202,11 +193,10 @@ RETURN QUERY
 	END;
 $$ LANGUAGE plpgsql;
 
-
 SELECT * FROM FncCheckRecommendation();
 
 
-//9
+-- 9
 
 CREATE OR REPLACE FUNCTION FncPercentagePeers(block1  VARCHAR, block2 VARCHAR)
 RETURNS  TABLE( StartedBlock1 NUMERIC,  StartedBlock2 NUMERIC, StartedBothBlocks NUMERIC,  DidntStartAnyBlock NUMERIC) AS $$
@@ -237,11 +227,9 @@ ROUND((SELECT COUNT(*) FROM bl3) * 100.0 / coun), ROUND((SELECT COUNT(*) FROM bl
 END;
 $$ LANGUAGE plpgsql;
 
-
 SELECT * FROM FncPercentagePeers('C', 'D');
 
-
-//10
+-- 10
 
 INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
 ('50','elmersha', 'C2_SimpleBash', '2023-03-26');
@@ -297,7 +285,7 @@ $$ LANGUAGE plpgsql;
 SELECT * FROM FncCheckBirthday();
 
 
-//11
+-- 11
 
 
 INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
@@ -360,7 +348,7 @@ $$ LANGUAGE plpgsql;
 
 SELECT * FROM FncPeersGivenTask('C2_SimpleBash','C3_s21_string+', 'C7_SmartCalc_v1.0');
 
-//12
+-- 12
 
 CREATE OR REPLACE FUNCTION FncRecursive()
 RETURNS TABLE(Task VARCHAR, PrevCount INTEGER) AS $$
@@ -383,7 +371,7 @@ END;
  SELECT * FROM  FncRecursive();
 
 
-//13
+-- 13
 
  INSERT INTO Checks(ID, Peer, Task, "Date") VALUES
 ('60','lorettec', 'D01_Linux', '2023-09-21'),
@@ -436,7 +424,7 @@ INSERT INTO Verter("Check", "State", "Time") VALUES
 
 
 CREATE OR REPLACE FUNCTION FncLackyDays(N INTEGER)
-RETURNS TABLE("Datee" Date) AS $$
+RETURNS TABLE("SearchedDate" Date) AS $$
 BEGIN
 RETURN QUERY
 WITH
@@ -482,15 +470,15 @@ fin AS (
 SELECT "Date", yu, sum(yu) OVER (ORDER BY "Date"  ROWS BETWEEN N - 1 PRECEDING AND CURRENT ROW) AS  num
 FROM total)
 SELECT DISTINCT("Date") FROM fin
-WHERE num>=N;
-	
+WHERE num>=N;	
 END;
   $$ LANGUAGE plpgsql;
   
- SELECT * FROM  FncLackyDays(3);
+SELECT * FROM  FncLackyDays(2);
 
 
-//14
+-- 14
+
 INSERT INTO XP("Check", XPAmount) VALUES
 (41, 50),
 (42, 100),
@@ -521,7 +509,7 @@ $$ LANGUAGE plpgsql;
 
 SELECT * FROM FncPeerMostXP();
 
-//15
+-- 15
 INSERT INTO TimeTracking(Peer, "Date", "Time", "State") VALUES
 ('omarval', '2023-09-20', TIME '11:15:22', '1'),
 ('omarval', '2023-09-20', TIME '16:18:14', '2');
@@ -541,7 +529,7 @@ $$ LANGUAGE plpgsql;
 SELECT * FROM FncBeforeTime('12:00:00', 2);
 
 
-//16
+-- 16
 
 CREATE OR REPLACE FUNCTION FncPeerLeftCampus(N INTEGER, Mm INTEGER)
 RETURNS  TABLE("Peer" VARCHAR) AS $$
@@ -555,9 +543,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-SELECT * FROM FncPeerLeftCampus(19, 2);
+SELECT * FROM FncPeerLeftCampus(21, 2);
 
-//17
+-- 17
 
 INSERT INTO TimeTracking(Peer, "Date", "Time", "State") VALUES
 ('ainorval', '2023-01-20', TIME '11:15:22', '1'),

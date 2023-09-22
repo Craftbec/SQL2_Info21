@@ -154,7 +154,7 @@ INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES
 (14,  'mikecall', 'Failure', '13:48:35'),
 (15,  'mjollor', 'Success', '22:11:46'),
 (16,  'elmersha', 'Success', '16:36:02'),
-(17,  'lorettec', 'Failure', '11:05:09'),
+(17,  'lorettec', 'Failure', '11:05:09');
 
 
 INSERT INTO TransferredPoints(CheckingPeer, CheckedPeer, PointsAmount) VALUES

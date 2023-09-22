@@ -1,16 +1,4 @@
-SELECT * FROM  Peers;
-SELECT * FROM  Tasks;
-SELECT * FROM  P2P;
-SELECT * FROM  Checks;
-SELECT * FROM  TransferredPoints;
-SELECT * FROM  Friends;
-SELECT * FROM  Recommendations;
-SELECT * FROM  XP;
-SELECT * FROM  TimeTracking;
-SELECT * FROM  Verter;
-
-
-//1
+-- 1
 
 CREATE OR REPLACE PROCEDURE AddP2PCheck(Peer1 varchar, Peer2 varchar, Task varchar, Status Status, tmp time)
 language plpgsql
@@ -24,14 +12,17 @@ BEGIN
 END;
 $$;
 
+SELECT Checks.peer, P2P.checkingpeer, Checks.task, P2P."State", P2P."Time" FROM P2P
+JOIN Checks
+ON Checks.id = P2P."Check"
+ORDER BY Checks.peer;
 
 CALL ADDP2PCheck ('oneudata', 'melodigr', 'C2_SimpleBash', 'Success', '17:15:15');
 CALL AddP2PCheck ('ainorval', 'melodigr', 'C2_SimpleBash', 'Start', '15:15:15');
 CALL AddP2PCheck ('elmersha', 'onrtyef', 'C5_s21_decimal', 'Failure', '15:15:15');
 
 
-
-///2
+-- 2
 
 CREATE OR REPLACE PROCEDURE AddVerterCheck(Pr varchar, Ts varchar, St Status, tmp time)
 language plpgsql
@@ -55,11 +46,16 @@ LIMIT 1);
 END;
 $$;
 
+SELECT Checks.peer, Checks.task, Verter."State", Verter."Time" FROM Verter
+JOIN Checks
+ON Verter."Check" = Checks.id
+ORDER BY Checks.peer;
 
 CALL AddVerterCheck ('oneudata', 'C2_SimpleBash', 'Success', '18:18:18');
 CALL AddVerterCheck ('oneudata', 'C4_s21_math', 'Success', '18:18:18');
 
-////3
+-- 3
+
 CREATE OR REPLACE FUNCTION P2PUpdatePoints()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -91,7 +87,7 @@ AFTER INSERT ON P2P
 FOR EACH ROW
 EXECUTE FUNCTION P2PUpdatePoints();
 
--- ПРИМЕР 
+
 SELECT * FROM  TransferredPoints;
 INSERT INTO Checks(ID, Peer, Task, "Date") VALUES ('30','kathayr', 'C2_SimpleBash', '2023-09-17');
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES (30, 'floridas',  'Start', '13:46:15');
@@ -100,8 +96,7 @@ INSERT INTO Checks(ID, Peer, Task, "Date") VALUES ('31','kathayr', 'C2_SimpleBas
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES (31, 'floridas',  'Start', '18:18:18');
 
 
-//4
-
+-- 4
 
 CREATE OR REPLACE FUNCTION ValidXP()
 RETURNS TRIGGER AS $$
@@ -136,7 +131,6 @@ CREATE OR REPLACE TRIGGER trg_ValidXP
   EXECUTE FUNCTION ValidXP();
 
 
--- ПРИМЕР
 SELECT * FROM  XP;
 INSERT INTO P2P("Check", CheckingPeer, "State", "Time") VALUES (31, 'floridas',  'Success', '13:46:15');
 INSERT INTO XP("Check", XPAmount) VALUES (30, 150);
